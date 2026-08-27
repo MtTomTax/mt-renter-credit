@@ -46,7 +46,6 @@
     outline-offset:2px;
   }
 
-  /* ---------- horizon header ---------- */
   .horizon-wrap{
     background:linear-gradient(180deg, var(--sky-deep) 0%, var(--sky) 62%, var(--wheat) 100%);
     position:relative;
@@ -86,7 +85,6 @@
     margin:0;
   }
 
-  /* ---------- main ---------- */
   main{max-width:760px; margin:0 auto; padding:0 24px 80px;}
 
   .card{
@@ -149,7 +147,6 @@
 
   .helptext{font-size:14.5px; color:#6B6455; margin-top:6px;}
 
-  /* ---------- results list ---------- */
   #results{margin-top:28px;}
   .results-heading{
     font-weight:700; font-size:15px; color:var(--sky-deep);
@@ -172,7 +169,6 @@
   .result-row .addr{font-weight:700;}
   .result-row .meta{color:#6B6455; font-size:14.5px; margin-top:3px;}
 
-  /* ---------- verdict ---------- */
   #verdict{margin-top:28px; display:none;}
   .verdict-card{
     border-radius:var(--radius);
@@ -223,7 +219,6 @@
 
   .verdict-actions{display:flex; gap:12px; flex-wrap:wrap;}
 
-  /* ---------- how it works ---------- */
   .how{margin-top:48px; padding-top:32px; border-top:1px solid var(--line);}
   .how h2{
     font-family:'Fraunces', serif; font-size:22px; font-weight:600; margin:0 0 14px;
@@ -284,11 +279,11 @@
       <div class="field-row">
         <div class="field">
           <label for="street">Street address</label>
-          <input type="text" id="street" name="street" placeholder="e.g. 412 N Last Chance Gulch" required>
+          <input type="text" id="street" name="street" placeholder="e.g. 1711 S 11th Ave" required>
         </div>
         <div class="field small">
           <label for="city">City <span style="font-weight:400;color:#8A8371;">(optional, narrows results)</span></label>
-          <input type="text" id="city" name="city" placeholder="e.g. Helena">
+          <input type="text" id="city" name="city" placeholder="e.g. Bozeman">
         </div>
       </div>
       <button type="submit" class="btn btn-primary btn-block" id="search-btn">
@@ -343,8 +338,7 @@ async function arcgisQuery(params){
   if(!resp.ok){
     throw new Error(`Lookup service returned status ${resp.status}`);
   }
-  const data = await resp.json();
-  return data;
+  return await resp.json();
 }
 
 function setLoading(isLoading){
@@ -370,13 +364,18 @@ form.addEventListener('submit', async function(e){
 
   const clauses = [`UPPER(AddressLine1) LIKE UPPER('%${escapeSql(street)}%')`];
   if(city){
-    clauses.push(`UPPER(CityStateZip) LIKE UPPER('%${escapeSql(city)}%')`);
+    // Some parcels (often LLC-owned commercial/apartment buildings) have a
+    // blank CityStateZip in the state's data even though the address itself
+    // is correct — so a plain AND on city would wrongly exclude them.
+    // Matching on city OR a blank city field keeps the narrowing benefit
+    // without silently dropping real matches.
+    clauses.push(`(UPPER(CityStateZip) LIKE UPPER('%${escapeSql(city)}%') OR CityStateZip IS NULL)`);
   }
   const where = clauses.join(' AND ');
 
   const params = new URLSearchParams({
     where: where,
-    outFields: 'PropType,AddressLine1,CityStateZip,OwnerName,Geocode,TotalValue,TotalLandValue,TotalBuildingValue,PropertyCardLink,TaxYear',
+    outFields: 'PropType,AddressLine1,CityStateZip,OwnerName,PARCELID,TotalValue,TaxYear',
     returnGeometry: 'false',
     resultRecordCount: '12',
     f: 'json'
@@ -420,7 +419,7 @@ function renderResults(features){
     btn.className = 'result-row';
     btn.innerHTML = `
       <div class="addr">${attrs.AddressLine1 || '(no address on file)'}</div>
-      <div class="meta">${attrs.CityStateZip || ''}${attrs.OwnerName ? ' · Owner: ' + attrs.OwnerName : ''}</div>
+      <div class="meta">${attrs.CityStateZip || '(city not on file)'}${attrs.OwnerName ? ' · Owner: ' + attrs.OwnerName : ''}</div>
     `;
     btn.addEventListener('click', () => {
       resultsEl.innerHTML = '';
@@ -434,10 +433,10 @@ function renderVerdict(attrs){
   const propType = (attrs.PropType || '').trim();
   const propTypeUpper = propType.toUpperCase();
   const totalValue = attrs.TotalValue;
-  const geocode = attrs.Geocode || '';
-  const cardLink = attrs.PropertyCardLink
-    ? (attrs.PropertyCardLink.startsWith('http') ? attrs.PropertyCardLink : `https://${attrs.PropertyCardLink}`)
-    : (geocode ? RECORD_CARD_BASE + encodeURIComponent(geocode) : 'https://svc.mt.gov/dor/property/prc');
+  const parcelId = attrs.PARCELID || '';
+  const cardLink = parcelId
+    ? RECORD_CARD_BASE + encodeURIComponent(parcelId)
+    : 'https://svc.mt.gov/dor/property/prc';
 
   let verdict, headline, body, stampText;
 
@@ -462,11 +461,11 @@ function renderVerdict(attrs){
   }
 
   const facts = [];
-  facts.push(['Address on file', `${attrs.AddressLine1 || '—'}, ${attrs.CityStateZip || ''}`]);
+  facts.push(['Address on file', `${attrs.AddressLine1 || '—'}, ${attrs.CityStateZip || '(city not on file)'}`]);
   if(attrs.OwnerName) facts.push(['Owner of record', attrs.OwnerName]);
   facts.push(['Property type code', propType || '—']);
   if(hasTaxableValue) facts.push(['Total assessed value', '$' + totalValue.toLocaleString()]);
-  if(geocode) facts.push(['Geocode (parcel ID)', geocode]);
+  if(parcelId) facts.push(['Parcel ID', parcelId]);
   if(attrs.TaxYear) facts.push(['Tax year on record', attrs.TaxYear]);
 
   verdictEl.innerHTML = `
