@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Does Your Rent Qualify? — Montana Elderly Renter Credit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1E232B;
+    --sky:#1C3D52;
+    --sky-deep:#12293A;
+    --wheat:#C99A3E;
+    --wheat-light:#E6C574;
+    --paper:#FAF7EF;
+    --paper-raised:#FFFFFF;
+    --line:#DCD3BC;
+    --good:#33614A;
+    --good-bg:#E7F0E9;
+    --bad:#9A4A2E;
+    --bad-bg:#F5E7E0;
+    --neutral:#5B5140;
+    --neutral-bg:#F0EBDC;
+    --focus:#1C3D52;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Public Sans', system-ui, sans-serif;
+    font-size:18px;
+    line-height:1.55;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  a{color:var(--sky);}
+  a:focus-visible, button:focus-visible, input:focus-visible{
+    outline:3px solid var(--focus);
+    outline-offset:2px;
+  }
+
+  .horizon-wrap{
+    background:linear-gradient(180deg, var(--sky-deep) 0%, var(--sky) 62%, var(--wheat) 100%);
+    position:relative;
+    overflow:hidden;
+    padding-bottom:2px;
+  }
+  .horizon-wrap svg{display:block; width:100%; height:auto;}
+  .header-inner{
+    max-width:760px;
+    margin:0 auto;
+    padding:36px 24px 12px;
+    position:relative;
+    z-index:2;
+    color:#FCF9F1;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--wheat-light);
+    margin:0 0 14px;
+    font-weight:600;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(34px, 6vw, 52px);
+    line-height:1.08;
+    margin:0 0 16px;
+    letter-spacing:-0.01em;
+  }
+  .header-sub{
+    font-size:19px;
+    max-width:52ch;
+    color:#EDE7D6;
+    margin:0;
+  }
+
+  main{max-width:760px; margin:0 auto; padding:0 24px 80px;}
+
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:32px;
+    margin-top:28px;
+    position:relative;
+    z-index:3;
+    box-shadow:0 18px 40px -22px rgba(18,41,58,.35);
+  }
+
+  label{
+    display:block;
+    font-weight:700;
+    font-size:15px;
+    margin-bottom:8px;
+    color:var(--sky-deep);
+  }
+  .field-row{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:18px;}
+  .field{flex:1 1 260px;}
+  .field.small{flex:1 1 160px;}
+  input[type="text"]{
+    width:100%;
+    font-family:inherit;
+    font-size:18px;
+    padding:14px 16px;
+    border-radius:10px;
+    border:1.5px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+  }
+  input[type="text"]::placeholder{color:#9A9280;}
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    font-family:'Public Sans', sans-serif;
+    font-weight:700;
+    font-size:17px;
+    padding:14px 26px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    min-height:52px;
+  }
+  .btn-primary{background:var(--sky); color:#fff;}
+  .btn-primary:hover{background:var(--sky-deep);}
+  .btn-primary:disabled{background:#9AA7AE; cursor:progress;}
+  .btn-outline{
+    background:transparent;
+    border:1.5px solid var(--sky);
+    color:var(--sky-deep);
+  }
+  .btn-outline:hover{background:#EEF3F5;}
+  .btn-block{width:100%;}
+
+  .helptext{font-size:14.5px; color:#6B6455; margin-top:6px;}
+
+  #results{margin-top:28px;}
+  .results-heading{
+    font-weight:700; font-size:15px; color:var(--sky-deep);
+    text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px;
+  }
+  .result-row{
+    width:100%;
+    text-align:left;
+    background:var(--paper);
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    padding:16px 18px;
+    margin-bottom:10px;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:16.5px;
+    color:var(--ink);
+  }
+  .result-row:hover{border-color:var(--sky); background:#F1EEE1;}
+  .result-row .addr{font-weight:700;}
+  .result-row .meta{color:#6B6455; font-size:14.5px; margin-top:3px;}
+
+  #verdict{margin-top:28px; display:none;}
+  .verdict-card{
+    border-radius:var(--radius);
+    padding:28px;
+    border:1.5px solid var(--line);
+  }
+  .verdict-card.good{background:var(--good-bg); border-color:#BFD6C6;}
+  .verdict-card.bad{background:var(--bad-bg); border-color:#E3C2B0;}
+  .verdict-card.neutral{background:var(--neutral-bg); border-color:#DED2AE;}
+
+  .stamp{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:14px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    padding:9px 16px;
+    border-radius:999px;
+    border:2px solid currentColor;
+    transform:rotate(-2deg);
+    margin-bottom:16px;
+  }
+  .good .stamp{color:var(--good);}
+  .bad .stamp{color:var(--bad);}
+  .neutral .stamp{color:var(--neutral);}
+
+  .verdict-headline{
+    font-family:'Fraunces', serif;
+    font-size:26px;
+    font-weight:600;
+    margin:0 0 10px;
+  }
+  .verdict-body{font-size:17px; margin:0 0 20px;}
+
+  .parcel-facts{
+    background:rgba(255,255,255,.55);
+    border-radius:10px;
+    padding:16px 18px;
+    margin-bottom:20px;
+    font-size:15px;
+  }
+  .parcel-facts dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:6px 16px;}
+  .parcel-facts dt{color:#5B5140; font-weight:600;}
+  .parcel-facts dd{margin:0; font-family:'IBM Plex Mono', monospace; font-size:14.5px;}
+
+  .verdict-actions{display:flex; gap:12px; flex-wrap:wrap;}
+
+  .intro{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:28px 32px;
+    margin-top:-56px;
+    position:relative;
+    z-index:3;
+    box-shadow:0 18px 40px -22px rgba(18,41,58,.35);
+  }
+  .how{margin:0;}
+  .how h2{
+    font-family:'Fraunces', serif; font-size:22px; font-weight:600; margin:0 0 14px;
+  }
+  .how ol{padding-left:22px; margin:0;}
+  .how li{margin-bottom:10px;}
+
+  .disclaimer{
+    margin-top:22px;
+    background:var(--neutral-bg);
+    border:1px solid #DED2AE;
+    border-radius:10px;
+    padding:18px 20px;
+    font-size:14.5px;
+    color:#4E4636;
+  }
+  .disclaimer strong{color:var(--sky-deep);}
+
+  footer{
+    text-align:center;
+    font-size:13.5px;
+    color:#8A8371;
+    padding:36px 24px 48px;
+  }
+  footer a{color:#6B6455;}
+
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+
+  .spinner{
+    width:16px; height:16px; border-radius:50%;
+    border:2.5px solid rgba(255,255,255,.5);
+    border-top-color:#fff;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @media (max-width:520px){
+    .intro, .card{padding:22px 18px;}
+    .header-inner{padding-bottom:48px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="horizon-wrap">
+  <div class="header-inner">
+    <p class="eyebrow">Montana Elderly Renter Credit — Property Check</p>
+    <h1>Does your rent&nbsp;qualify?</h1>
+    <p class="header-sub">To claim Montana's Elderly Renter Credit, the property you rent must be subject to Montana property tax. Enter the address below to check.</p>
+  </div>
+  <svg viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,90 L0,55 L120,40 L260,58 L420,30 L560,52 L720,20 L900,50 L1080,34 L1260,56 L1440,42 L1440,90 Z" fill="var(--paper)"></path>
+  </svg>
+</div>
+
+<main>
+  <div class="intro">
+    <section class="how">
+      <h2>How this works</h2>
+      <ol>
+        <li>You enter the rental property's address.</li>
+        <li>We query the Montana State Library / Department of Revenue's public Cadastral parcel database for a matching parcel.</li>
+        <li>We show you how that parcel is coded — taxable or tax-exempt — and link straight to the state's official Property Record Card so you (or your tax preparer) can confirm before filing.</li>
+      </ol>
+    </section>
+
+    <div class="disclaimer">
+      <strong>This tool is a research aid, not tax advice.</strong> Property records occasionally lag ownership or exemption changes, and some properties (like certain government, tribal, or nonprofit-owned buildings) are only partly exempt. Before filing, confirm the property's status on the linked official Property Record Card, or contact your county Department of Revenue office or a tax professional. This site is not operated by the State of Montana.
+    </div>
+  </div>
+
+  <section class="card" aria-labelledby="search-heading">
+    <h2 id="search-heading" class="sr-only">Look up an address</h2>
+    <form id="search-form" autocomplete="off">
+      <div class="field-row">
+        <div class="field">
+          <label for="street">Street address</label>
+          <input type="text" id="street" name="street" placeholder="e.g. 1711 S 11th Ave" required>
+        </div>
+        <div class="field small">
+          <label for="city">City <span style="font-weight:400;color:#8A8371;">(optional, narrows results)</span></label>
+          <input type="text" id="city" name="city" placeholder="e.g. Bozeman">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="search-btn">
+        <span id="search-btn-label">Check this address</span>
+      </button>
+      <p class="helptext">We search Montana's own public Cadastral parcel records — the same data the state uses.</p>
+    </form>
+
+    <div id="status" role="status" aria-live="polite"></div>
+
+    <div id="results"></div>
+    <div id="verdict"></div>
+  </section>
+
+</main>
+
+<footer>
+  Data source: <a href="https://svc.mt.gov/msl/cadastral" target="_blank" rel="noopener">Montana Cadastral</a>, Montana State Library &amp; Dept. of Revenue.
+</footer>
+
+<script>
+// Montana Cadastral's Property Details page (the old svc.mt.gov/dor/property/prc
+// link was retired by the state and now returns a 404).
+const RECORD_CARD_BASE = "https://svc.mt.gov/msl/cadastral/?page=PropertyDetails&geocode=";
+
+const form = document.getElementById('search-form');
+const statusEl = document.getElementById('status');
+const resultsEl = document.getElementById('results');
+const verdictEl = document.getElementById('verdict');
+const searchBtn = document.getElementById('search-btn');
+const searchBtnLabel = document.getElementById('search-btn-label');
+
+function escapeSql(str){
+  return str.replace(/'/g, "''");
+}
+
+// Our own Netlify serverless function does the actual call to Montana's
+// server (server-to-server, so CORS doesn't apply). We just call our own
+// domain here, which is always same-origin.
+async function arcgisQuery(params){
+  const resp = await fetch(`/.netlify/functions/query?${params.toString()}`);
+  if(!resp.ok){
+    throw new Error(`Lookup service returned status ${resp.status}`);
+  }
+  return await resp.json();
+}
+
+function setLoading(isLoading){
+  searchBtn.disabled = isLoading;
+  searchBtnLabel.innerHTML = isLoading
+    ? '<span class="spinner" aria-hidden="true"></span> Searching…'
+    : 'Check this address';
+}
+
+form.addEventListener('submit', async function(e){
+  e.preventDefault();
+  resultsEl.innerHTML = '';
+  verdictEl.style.display = 'none';
+  verdictEl.innerHTML = '';
+  statusEl.textContent = '';
+
+  const street = document.getElementById('street').value.trim();
+  const city = document.getElementById('city').value.trim();
+
+  if(!street){ return; }
+
+  setLoading(true);
+
+  const clauses = [`UPPER(AddressLine1) LIKE UPPER('%${escapeSql(street)}%')`];
+  if(city){
+    // Some parcels (often LLC-owned commercial/apartment buildings) have a
+    // blank CityStateZip in the state's data even though the address itself
+    // is correct — so a plain AND on city would wrongly exclude them.
+    // Matching on city OR a blank city field keeps the narrowing benefit
+    // without silently dropping real matches.
+    clauses.push(`(UPPER(CityStateZip) LIKE UPPER('%${escapeSql(city)}%') OR CityStateZip IS NULL)`);
+  }
+  const where = clauses.join(' AND ');
+
+  const params = new URLSearchParams({
+    where: where,
+    outFields: 'PropType,AddressLine1,CityStateZip,OwnerName,PARCELID,TotalValue,TaxYear',
+    returnGeometry: 'false',
+    resultRecordCount: '12',
+    f: 'json'
+  });
+
+  try{
+    const data = await arcgisQuery(params);
+
+    if(data.error){
+      throw new Error(data.error.message || 'Lookup failed');
+    }
+
+    const features = (data.features || []).map(f => f.attributes);
+
+    if(features.length === 0){
+      statusEl.innerHTML = `<p style="color:#9A4A2E; font-weight:600; margin-top:20px;">No matching parcel found. Try just the street number and name (no "Ave"/"St"), and double-check the city.</p>`;
+      setLoading(false);
+      return;
+    }
+
+    if(features.length === 1){
+      renderVerdict(features[0]);
+    } else {
+      renderResults(features);
+    }
+  } catch(err){
+    statusEl.innerHTML = `<p style="color:#9A4A2E; font-weight:600; margin-top:20px;">Something went wrong reaching the state's records (${err.message}). Please try again in a moment.</p>`;
+  }
+  setLoading(false);
+});
+
+function renderResults(features){
+  const heading = document.createElement('div');
+  heading.className = 'results-heading';
+  heading.textContent = `${features.length} matching properties — select yours`;
+  resultsEl.appendChild(heading);
+
+  features.forEach(attrs => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'result-row';
+    btn.innerHTML = `
+      <div class="addr">${attrs.AddressLine1 || '(no address on file)'}</div>
+      <div class="meta">${attrs.CityStateZip || '(city not on file)'}${attrs.OwnerName ? ' · Owner: ' + attrs.OwnerName : ''}</div>
+    `;
+    btn.addEventListener('click', () => {
+      resultsEl.innerHTML = '';
+      renderVerdict(attrs);
+    });
+    resultsEl.appendChild(btn);
+  });
+}
+
+function renderVerdict(attrs){
+  const propType = (attrs.PropType || '').trim();
+  const propTypeUpper = propType.toUpperCase();
+  const totalValue = attrs.TotalValue;
+  const parcelId = attrs.PARCELID || '';
+  const cardLink = parcelId
+    ? RECORD_CARD_BASE + encodeURIComponent(parcelId)
+    : 'https://svc.mt.gov/msl/cadastral/';
+
+  let verdict, headline, body, stampText;
+
+  const looksExempt = propTypeUpper.includes('EXEMPT');
+  const hasTaxableValue = typeof totalValue === 'number' && totalValue > 0;
+
+  if(looksExempt){
+    verdict = 'bad';
+    stampText = 'Likely does not qualify';
+    headline = "This property looks tax-exempt";
+    body = `The state's records code this parcel's property type as "${propType}", which suggests it is exempt from Montana property tax. Rent paid on an exempt property generally does <strong>not</strong> qualify for the Elderly Renter Credit. Confirm on the official record card below before ruling it out.`;
+  } else if(hasTaxableValue){
+    verdict = 'good';
+    stampText = 'Likely qualifies';
+    headline = "This property appears to be subject to Montana property tax";
+    body = `This parcel has a taxable assessed value on record (property type: "${propType || 'not specified'}"), which means it's generally subject to Montana property tax. Rent paid here would typically qualify for the Elderly Renter Credit. Confirm the current status on the official record card before filing.`;
+  } else {
+    verdict = 'neutral';
+    stampText = 'Needs manual check';
+    headline = "We couldn't determine this automatically";
+    body = `This parcel's property type ("${propType || 'not specified'}") and assessed value don't clearly indicate taxable or exempt status from the data available here. Please open the official Property Record Card below to check its tax status directly.`;
+  }
+
+  const facts = [];
+  facts.push(['Address on file', `${attrs.AddressLine1 || '—'}, ${attrs.CityStateZip || '(city not on file)'}`]);
+  if(attrs.OwnerName) facts.push(['Owner of record', attrs.OwnerName]);
+  facts.push(['Property type code', propType || '—']);
+  if(hasTaxableValue) facts.push(['Total assessed value', '$' + totalValue.toLocaleString()]);
+  if(parcelId) facts.push(['Parcel ID', parcelId]);
+  if(attrs.TaxYear) facts.push(['Tax year on record', attrs.TaxYear]);
+
+  verdictEl.innerHTML = `
+    <div class="verdict-card ${verdict}">
+      <div class="stamp">${stampText}</div>
+      <h3 class="verdict-headline">${headline}</h3>
+      <p class="verdict-body">${body}</p>
+      <div class="parcel-facts">
+        <dl>
+          ${facts.map(([k,v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}
+        </dl>
+      </div>
+      <div class="verdict-actions">
+        <a class="btn btn-primary" href="${cardLink}" target="_blank" rel="noopener">Open official Property Record Card</a>
+        <button type="button" class="btn btn-outline" id="search-again">Search another address</button>
+      </div>
+    </div>
+  `;
+  verdictEl.style.display = 'block';
+  verdictEl.scrollIntoView({behavior: 'smooth', block: 'start'});
+
+  document.getElementById('search-again').addEventListener('click', () => {
+    verdictEl.style.display = 'none';
+    verdictEl.innerHTML = '';
+    document.getElementById('street').value = '';
+    document.getElementById('city').value = '';
+    document.getElementById('street').focus();
+  });
+}
+</script>
+
+</body>
+</html>
