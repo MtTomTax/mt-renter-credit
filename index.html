@@ -334,7 +334,9 @@
 </footer>
 
 <script>
-const RECORD_CARD_BASE = "https://svc.mt.gov/dor/property/prc?geocode=";
+// Montana Cadastral's Property Details page (the old svc.mt.gov/dor/property/prc
+// link was retired by the state and now returns a 404).
+const RECORD_CARD_BASE = "https://svc.mt.gov/msl/cadastral/?page=PropertyDetails&geocode=";
 
 const form = document.getElementById('search-form');
 const statusEl = document.getElementById('status');
@@ -453,7 +455,7 @@ function renderVerdict(attrs){
   const parcelId = attrs.PARCELID || '';
   const cardLink = parcelId
     ? RECORD_CARD_BASE + encodeURIComponent(parcelId)
-    : 'https://svc.mt.gov/dor/property/prc';
+    : 'https://svc.mt.gov/msl/cadastral/';
 
   let verdict, headline, body, stampText;
 
